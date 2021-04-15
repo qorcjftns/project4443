@@ -11,6 +11,9 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Toast;
 
+import java.util.Calendar;
+import java.util.Random;
+
 public class GamePanel_2 extends SurfaceView implements SurfaceHolder.Callback {
 
     private GameThread thread;
@@ -22,8 +25,19 @@ public class GamePanel_2 extends SurfaceView implements SurfaceHolder.Callback {
 
     private EmptyGhost eg;
 
+    private Random random;
     private String label;
-    Paint labelpaint;
+    private int labelint;
+
+    private String lastStat;
+    private String avgStat;
+
+    private long time[];
+    private long totaltime;
+    private int  count;
+    private long lastTime;
+
+    Paint labelpaint, statpaint;
 
     // Provide three constructors to correspond to each of the three in View
     public GamePanel_2(Context context, AttributeSet attrs, int defStyle)
@@ -44,13 +58,35 @@ public class GamePanel_2 extends SurfaceView implements SurfaceHolder.Callback {
         initialize(context);
     }
 
+    private void randomTarget() {
+        labelint = random.nextInt(5);
+        this.label = String.format("%d", labelint + 1);
+    }
+
+    private void checkCorrect(int btn) {
+        if(btn == labelint) {
+            randomTarget();
+            long curtime = Calendar.getInstance().getTimeInMillis();
+            time[count++] = curtime - lastTime;
+            totaltime += curtime - lastTime;
+            lastTime = curtime;
+        }
+    }
+
+
     public void initialize(Context c){
         getHolder().addCallback(this);
 
+        random = new Random();
+
+        time = new long[20];
+        totaltime = 0;
+        count = 0;
+        lastTime = Calendar.getInstance().getTimeInMillis();
+        randomTarget();
 
         js = new Joystick_2(400,700,30,100);
         myc = new Mycharacter(getContext(), js, 50,50);
-        label = "";
 
         setFocusable(true);
 
@@ -59,6 +95,12 @@ public class GamePanel_2 extends SurfaceView implements SurfaceHolder.Callback {
         labelpaint.setStyle(Paint.Style.FILL_AND_STROKE);
         labelpaint.setTextSize(100);
         labelpaint.setAntiAlias(true);
+
+        statpaint = new Paint();
+        statpaint.setColor(Color.BLACK);
+        statpaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        statpaint.setTextSize(60);
+        statpaint.setAntiAlias(true);
 
     }
 
@@ -85,6 +127,11 @@ public class GamePanel_2 extends SurfaceView implements SurfaceHolder.Callback {
         float height = this.getHeight();
 
         canvas.drawText(this.label, width / 2 - 50, height / 3, labelpaint);
+
+        if(totaltime != 0) {
+            String statText = String.format("Average Time: %.2fs", ((float) totaltime / count) / 1000);
+            canvas.drawText(statText, width / 2 - 260, 50, statpaint);
+        }
 
         
         //dont know what is going on, cannot delete this unused class.
@@ -152,33 +199,36 @@ public class GamePanel_2 extends SurfaceView implements SurfaceHolder.Callback {
                 if(js.isSpellActive){
                     if(js.isOnSpell(me.getX(),me.getY())){
                         //Spell button=======================spell 3
-                        this.label = "3";
+//                        this.label = "3";
+                        checkCorrect(2);
                     }
                 }
                 else if(js.is1Active){
                     if(js.isOnSpell1(me.getX(),me.getY())){
                         //spell 1
-                        this.label = "1";
+//                        this.label = "1";
+                        checkCorrect(0);
                     }
                 }
                 else if(js.is2Active){
                     if(js.isOnSpell2(me.getX(),me.getY())){
                         //spell 2
-                        this.label = "2";
+//                        this.label = "2";
+                        checkCorrect(1);
                     }
                 }
                 else if(js.is3Active){
                     if(js.isOnSpell3(me.getX(),me.getY())){
                         //spell 4
-                        this.label = "4";
+//                        this.label = "4";
+                        checkCorrect(3);
                     }
                 }
                 else if(js.is4Active){
                     if(js.isOnSpell4(me.getX(),me.getY())){
                         //spell 5
-                        this.label = "5";
-
-                        Toast.makeText(getContext(),"spell_5",Toast.LENGTH_SHORT).show();
+//                        this.label = "5";
+                        checkCorrect(4);
                     }
                 }
 

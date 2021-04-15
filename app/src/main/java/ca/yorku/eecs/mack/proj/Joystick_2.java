@@ -27,9 +27,8 @@ public class Joystick_2 {
 
 
     private Paint outerP, innerP;
-
-
     private Paint bPaint,bActPaint;
+    private Paint labelpaint;
 
 
     public double innerFinalX, innerFinalY;
@@ -80,7 +79,11 @@ public class Joystick_2 {
         bActPaint.setColor(0xFF550000);
         bActPaint.setStyle(Paint.Style.FILL_AND_STROKE);
 
-
+        labelpaint = new Paint();
+        labelpaint.setColor(Color.LTGRAY);
+        labelpaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        labelpaint.setTextSize(100);
+        labelpaint.setAntiAlias(true);
 
     }
 
@@ -119,6 +122,14 @@ public class Joystick_2 {
             canvas.drawCircle(button4X,button4Y,buttonR,bPaint);
 
 
+        float labelX = buttonX-25;
+        float labelY = buttonY+30;
+        float offset = 150;
+        canvas.drawText("1", labelX-offset, labelY-offset, labelpaint);
+        canvas.drawText("2", labelX+offset, labelY-offset, labelpaint);
+        canvas.drawText("3", labelX, labelY, labelpaint);
+        canvas.drawText("4", labelX-offset,labelY+offset, labelpaint);
+        canvas.drawText("5", labelX+offset,labelY+offset, labelpaint);
 
 
     }

@@ -10,6 +10,9 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Toast;
 
+import java.util.Calendar;
+import java.util.Random;
+
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback
 {
 
@@ -27,9 +30,16 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback
 
     private Mycharacter myc;
 
-
+    private Random random;
     private String label;
-    Paint labelpaint;
+    private int labelint;
+
+    private long time[];
+    private long totaltime;
+    private int  count;
+    private long lastTime;
+
+    Paint labelpaint, statpaint;
 
 
     // Provide three constructors to correspond to each of the three in View
@@ -51,11 +61,33 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback
         initialize(context);
     }
 
+    private void randomTarget() {
+        labelint = random.nextInt(5);
+        this.label = String.format("%d", labelint + 1);
+    }
+
+    private void checkCorrect(int btn) {
+        if(btn == labelint) {
+            randomTarget();
+            long curtime = Calendar.getInstance().getTimeInMillis();
+            time[count++] = curtime - lastTime;
+            totaltime += curtime - lastTime;
+            lastTime = curtime;
+        }
+    }
+
 
     private void initialize(Context context)
     {
         getHolder().addCallback(this);
         thread = new GameThread(getHolder(),this);
+        random = new Random();
+
+        time = new long[20];
+        totaltime = 0;
+        count = 0;
+        lastTime = Calendar.getInstance().getTimeInMillis();
+        randomTarget();
 
         js = new Joystick_1(400,700,30,100);
         myc = new Mycharacter(getContext(), js, 50,50);
@@ -68,6 +100,12 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback
         labelpaint.setStyle(Paint.Style.FILL_AND_STROKE);
         labelpaint.setTextSize(100);
         labelpaint.setAntiAlias(true);
+
+        statpaint = new Paint();
+        statpaint.setColor(Color.BLACK);
+        statpaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        statpaint.setTextSize(60);
+        statpaint.setAntiAlias(true);
 
     }
 
@@ -90,6 +128,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback
 
         canvas.drawColor(Color.GRAY);
 
+        time = new long[20];
 
         myc.draw(canvas);
         js.draw(canvas);
@@ -98,6 +137,11 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback
         float height = this.getHeight();
 
         canvas.drawText(this.label, width / 2 - 50, height / 3, labelpaint);
+
+        if(totaltime != 0) {
+            String statText = String.format("Average Time: %.2fs", ((float) totaltime / count) / 1000);
+            canvas.drawText(statText, width / 2 - 260, 50, statpaint);
+        }
 
         //dont know what is going on, cannot delete this unused class.
         eg.draw();
@@ -145,19 +189,19 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback
                 if(js.isSpellActive){
                     if(js.isOnSpell(me.getX(),me.getY())){
                         //Spell button=======================
-                        label = "3";
+                        checkCorrect(2);
                     }else if(me.getX()< js.buttonX && me.getY()< js.buttonY){
                         //Direction top-left======================
-                        label = "1";
+                        checkCorrect(0);
                     }else if(me.getX()> js.buttonX && me.getY()< js.buttonY){
                         //Direction top-right=====================
-                        label = "2";
+                        checkCorrect(1);
                     }else if(me.getX()< js.buttonX && me.getY()> js.buttonY){
                         //Direction bot-left=======================
-                        label = "4";
+                        checkCorrect(3);
                     }else if(me.getX() > js.buttonX && me.getY()> js.buttonY){
                         //Direction bot-right====================
-                        label = "5";
+                        checkCorrect(4);
                     }
 
                 }
