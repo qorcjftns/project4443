@@ -12,5 +12,12 @@
     <string name="paramlabelpathtypetext">Path type</string>
     <string name="button01text">OK</string>
     <string name="button03text">Exit</string>
+    <string name="resultText">Test Result</string>
 
+
+    <string name="resulttestcount">Test Count = </string>
+    <string name="resulttotaltime">Test Total Time = </string>
+    <string name="resultmissrate">Miss Count = </string>
+    <string name="resultSetupButtonText">Setup</string>
+    <string name="resultExitButtonText">Exit</string>
 </resources>

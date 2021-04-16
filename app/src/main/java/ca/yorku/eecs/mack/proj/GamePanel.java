@@ -1,9 +1,11 @@
 package ca.yorku.eecs.mack.proj;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -35,6 +37,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback
     private int labelint;
 
     private long time[];
+    private int  miss[];
     private long totaltime;
     private int  count;
     private long lastTime;
@@ -73,6 +76,20 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback
             time[count++] = curtime - lastTime;
             totaltime += curtime - lastTime;
             lastTime = curtime;
+
+            if(count == 20) {
+                Intent i = new Intent(this.getContext(), TestResultsActivity.class);
+                Bundle b = new Bundle();
+                b.putInt("testCount", count);
+                b.putLongArray("testResult", time);
+                b.putIntArray("missRates", miss);
+
+                i.putExtras(b);
+
+                getContext().startActivity(i);
+            }
+        } else {
+            miss[count] += 1;
         }
     }
 
@@ -84,6 +101,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback
         random = new Random();
 
         time = new long[20];
+        miss = new int[20];
         totaltime = 0;
         count = 0;
         lastTime = Calendar.getInstance().getTimeInMillis();
